@@ -3,9 +3,15 @@ from pydantic import BaseModel,ConfigDict
 from pydantic.networks import EmailStr
 
 #model to validate input
-class UserCreate(BaseModel):
+class UserSignup(BaseModel):
     name: str
     email: EmailStr
+    password: str
+
+#model to user Login
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
 #model to return response
 class UserResponse(BaseModel):
@@ -28,5 +34,9 @@ class ApplicationResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+class ApplicationforCurrentUser(BaseModel):
+    company: str
+    role: str
+    status: str
 
 
