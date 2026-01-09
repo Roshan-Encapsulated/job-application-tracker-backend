@@ -1,7 +1,17 @@
 from pydantic import EmailStr
-from sqlalchemy import Column, Integer, Text, ForeignKey
+from sqlalchemy import Column, Integer, Text, ForeignKey,DateTime
 from sqlalchemy.orm import relationship
 from . import database
+from datetime import datetime
+from sqlalchemy import Enum as SqlEnum
+from enum import Enum
+
+class ApplicationStatus(str,Enum):
+    APPLIED = "APPLIED"
+    REJECTED = "REJECTED"
+    OFFER = "OFFER"
+    INTERVIEW = "INTERVIEW"
+
 
 
 # User model (table)
@@ -23,7 +33,14 @@ class Application(database.Base):
     id = Column(Integer, primary_key=True, index=True)
     company = Column(Text, nullable=False)
     role = Column(Text, nullable=False)
-    status = Column(Text, nullable=False)
-
+    platform = Column(Text, nullable=False)
+    experience = Column(Integer, nullable=False)
+    applied_at = Column(DateTime, default=datetime.utcnow)
+    status = Column(
+        SqlEnum(ApplicationStatus),
+        default=ApplicationStatus.APPLIED,
+        nullable=False
+    )
     user_id = Column(Integer, ForeignKey("users.id"))
+
     user = relationship("User", back_populates="applications")

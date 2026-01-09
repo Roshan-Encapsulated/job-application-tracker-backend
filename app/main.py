@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from starlette import status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from .schemas import UserSignup, ApplicationCreate, ApplicationResponse, UserResponse,ApplicationforCurrentUser
+from .schemas import UserSignup, ApplicationCreate, ApplicationResponse, UserResponse,StatusUpdate,ApplicationforCurrentUser,applicationtoPredict,predictResponse
 from . import database
 from sqlalchemy.orm import Session
 from typing import List
@@ -70,3 +70,10 @@ def read_current_user_applications(user_id : int = Depends(protectedroutes.get_c
 def create_application_for_current_user(application : ApplicationforCurrentUser,user_id : int = Depends(protectedroutes.get_current_user),db : Session = Depends(database.get_db)):
     return crud.create_application_for_current_user(application,user_id, db)
 
+@app.put("/users/me/applications/{application_id}",response_model = ApplicationResponse)
+def update_status(application_id : int,newstatus : StatusUpdate,user_id : int = Depends(protectedroutes.get_current_user), db : Session = Depends(database.get_db)):
+    return crud.update_status(application_id,newstatus,user_id, db)
+
+@app.post("/users/me/predict-application-success",response_model = predictResponse)
+def predict_success(application : applicationtoPredict):
+    return crud.predict_success(application)

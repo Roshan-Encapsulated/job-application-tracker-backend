@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 from . import security
 from fastapi.security import OAuth2PasswordRequestForm
+from ml.predictor import predict
 
 
 def create_user(user: schemas.UserSignup,db: Session):
@@ -60,7 +61,7 @@ def create_application(application: schemas.ApplicationCreate,db : Session):
     if ifapplicationexist:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Application already exists")
 
-    newapplication = models.Application(company=application.company, role=application.role, status = application.status, user_id = application.user_id)
+    newapplication = models.Application(company=application.company, role=application.role, experience = application.experience,platform=application.platform, user_id = application.user_id)
 
     db.add(newapplication)
     db.commit()
@@ -98,9 +99,40 @@ def create_application_for_current_user(application: schemas.ApplicationforCurre
     if ifapplicationexists:
          raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Application already exists")
 
-    newapplication = models.Application(company=application.company, role=application.role, status = application.status, user_id = id)
+    newapplication = models.Application(company=application.company, role=application.role, experience = application.experience, user_id = id)
 
     db.add(newapplication)
     db.commit()
     db.refresh(newapplication)
     return newapplication
+
+def update_status(application_id : int, newstatus : schemas.StatusUpdate, user_id :int, db : Session):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist")
+    application = db.query(models.Application).filter(models.Application.id == application_id).first()
+    application.status = newstatus.status
+    db.add(application)
+    db.commit()
+    db.refresh(application)
+    return application
+
+
+def predict_success(application : schemas.applicationtoPredict):
+    probability = predict(application.dict())
+
+    if probability >= 0.7:
+        interpretation = "High Chance"
+    elif probability >= 0.5:
+        interpretation = "Moderate Chance"
+    else:
+        interpretation = "Low Chance"
+
+    dict = {
+        "success": probability,
+         "interpretation": interpretation,
+    }
+    return dict
+
+
+
