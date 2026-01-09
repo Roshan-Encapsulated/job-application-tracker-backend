@@ -1,99 +1,56 @@
-Job Application Tracker – Backend
+# Job Application Tracker – ML Prediction Feature
 
-A production-style backend API for tracking job and internship applications, built with FastAPI, PostgreSQL, and SQLAlchemy.
-Designed with clean architecture, proper validation, relational data modeling, and RESTful principles.
+This branch introduces **Machine Learning integration** into the backend to
+predict the likelihood of a job application being successful.
 
-Features  Core Backend
-```text
-User management
+## ML Objective
 
-Job / internship application tracking
+Predict whether a job application is likely to result in:
+- Interview / Offer (Success)
+- Rejection (Failure)
 
-One-to-many relationship (User → Applications)
+## Data Source
 
-Clean CRUD APIs
+- Historical job applications stored in PostgreSQL
+- Only applications with final outcomes are used for training
 
-Proper HTTP status codes & error handling
+## Features Used
 
+- Company
+- Role
+- Platform (LinkedIn, Referral, etc.)
+- Candidate experience (in years)
+- Day of application (derived from timestamp)
+
+## Model Details
+
+- Algorithm: Logistic Regression
+- Library: scikit-learn
+- Categorical features encoded using one-hot encoding
+- Model trained offline using Pandas
+- Feature schema stored to ensure correct prediction alignment
+
+## Training Strategy
+
+- Offline batch training
+- Model retrained periodically as more labeled data is collected
+- Training is not triggered during API requests
+
+## Prediction Endpoint
+### Sample Request
+```json
+{
+  "company": "Google",
+  "role": "Backend Engineer",
+  "platform": "LinkedIn",
+  "experience": 2.0,
+  "applied_day": 2
+}
 ```
-
-Backend Engineering Practices
+### Sample Response
+```json
+{
+  "success_probability": 0.42,
+  "interpretation": "Low chance"
+}
 ```
-Layered architecture (main.py, crud.py, schemas.py, models.py)
-SQLAlchemy ORM with relationships
-Pydantic request & response schemas
-Dependency injection using FastAPI
-PostgreSQL integration
-```
-Planned Enhancements
-```
-Authentication & Authorization (JWT)
-Password hashing
-Protected routes
-ML-based insights on applications (analytics / predictions)
-Cloud deployment
-```
-Tech Stack
-```
-Backend Framework: FastAPI
-Database: PostgreSQL
-ORM: SQLAlchemy
-Validation: Pydantic
-Language: Python
-API Docs: Swagger UI (/docs)
-```
-
-Project Structure
-```text
-job-application-tracker-backend/
-├── app/
-│   ├── main.py          # API entry point & routes
-│   ├── crud.py          # Database CRUD logic
-│   ├── models.py        # SQLAlchemy database models
-│   ├── schemas.py       # Pydantic request/response validation
-│   └── database.py      # Engine configuration & SessionLocal
-├── .gitignore           # Python & Environment exclusions
-├── requirements.txt     # Project dependencies
-└── README.md            # Project documentation
-
-```
- Database Design
-
-User
-```
-id
-name
-email
-```
-
-Application
-```
-id
-company
-role
-status
-user_id (Foreign Key → User)
-
-Relationship:
-One User → Many Applications
-```
-
- API Endpoints
-```
-Users
-POST   /users
-GET    /users
-GET    /users/{user_id}/applications
-```
-
-Applications
-```
-POST   /applications
-GET    /applications
-```
-Author 🧑🏻‍💻
-
-Roshan
-
-Backend & AI-oriented Developer
-Focused on building scalable, future-ready systems.
