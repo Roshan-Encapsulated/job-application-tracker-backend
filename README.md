@@ -1,99 +1,42 @@
-Job Application Tracker – Backend
+# Job Application Tracker – Authentication Module
 
-A production-style backend API for tracking job and internship applications, built with FastAPI, PostgreSQL, and SQLAlchemy.
-Designed with clean architecture, proper validation, relational data modeling, and RESTful principles.
+This branch adds **secure authentication and authorization** to the Job Application Tracker backend.
 
-Features  Core Backend
-```text
-User management
+## Features Implemented
 
-Job / internship application tracking
+- User signup with password hashing (bcrypt)
+- User login with JWT token generation
+- OAuth2 password flow
+- Protected routes using Bearer tokens
+- User-specific access control
 
-One-to-many relationship (User → Applications)
+## Authentication Flow
 
-Clean CRUD APIs
+1. User signs up with email and password  
+2. Password is securely hashed before storing in the database  
+3. User logs in and receives a JWT access token  
+4. Token is sent in the `Authorization` header for protected requests  
+5. Backend validates token and identifies the current user  
 
-Proper HTTP status codes & error handling
+## Key Endpoints
 
-```
+- `POST /users/signup` – Create a new user  
+- `POST /users/login` – Authenticate user and return JWT  
+- Protected routes require:
 
-Backend Engineering Practices
-```
-Layered architecture (main.py, crud.py, schemas.py, models.py)
-SQLAlchemy ORM with relationships
-Pydantic request & response schemas
-Dependency injection using FastAPI
-PostgreSQL integration
-```
-Planned Enhancements
-```
-Authentication & Authorization (JWT)
-Password hashing
-Protected routes
-ML-based insights on applications (analytics / predictions)
-Cloud deployment
-```
-Tech Stack
-```
-Backend Framework: FastAPI
-Database: PostgreSQL
-ORM: SQLAlchemy
-Validation: Pydantic
-Language: Python
-API Docs: Swagger UI (/docs)
-```
 
-Project Structure
-```text
-job-application-tracker-backend/
-├── app/
-│   ├── main.py          # API entry point & routes
-│   ├── crud.py          # Database CRUD logic
-│   ├── models.py        # SQLAlchemy database models
-│   ├── schemas.py       # Pydantic request/response validation
-│   └── database.py      # Engine configuration & SessionLocal
-├── .gitignore           # Python & Environment exclusions
-├── requirements.txt     # Project dependencies
-└── README.md            # Project documentation
+## Security Notes
 
-```
- Database Design
+- Passwords are never stored in plain text
+- JWT tokens contain user identity and expiry
+- Access to applications is restricted to the owner
 
-User
-```
-id
-name
-email
-```
+## Tech Stack
 
-Application
-```
-id
-company
-role
-status
-user_id (Foreign Key → User)
+- FastAPI
+- PostgreSQL
+- SQLAlchemy ORM
+- JWT (OAuth2)
+- Passlib (bcrypt)
 
-Relationship:
-One User → Many Applications
-```
-
- API Endpoints
-```
-Users
-POST   /users
-GET    /users
-GET    /users/{user_id}/applications
-```
-
-Applications
-```
-POST   /applications
-GET    /applications
-```
-Author 🧑🏻‍💻
-
-Roshan
-
-Backend & AI-oriented Developer
-Focused on building scalable, future-ready systems.
+This branch focuses on **backend security and access control**, following industry best practices.
